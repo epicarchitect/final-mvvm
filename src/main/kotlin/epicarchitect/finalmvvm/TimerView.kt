@@ -63,3 +63,48 @@ fun timerView() = LinearLayout(this@Context).apply {
         )
     )
 }
+
+context(
+    Context,
+    LifecycleOwner,
+    ViewModelStoreOwner
+)
+fun niceTimerView() = LinearLayout(this@Context).apply {
+    val viewModel = ViewModelProvider(this@ViewModelStoreOwner)[NiceTimerViewModel::class.java]
+    val durationFormatter = DurationFormatter()
+    gravity = Gravity.CENTER
+    orientation = LinearLayout.VERTICAL
+    addView(
+        TextView(context).apply {
+            viewModel.timerValue.bind {
+                text = durationFormatter.format(it)
+            }
+            viewModel.isRunning.bind {
+                isEnabled = it
+            }
+        },
+        ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    )
+    addView(
+        Button(context).apply {
+            viewModel.isRunning.bind {
+                text = if (it) {
+                    "Pause"
+                } else {
+                    "Play"
+                }
+            }
+
+            setOnClickListener {
+                viewModel.repeat.toggle()
+            }
+        },
+        ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    )
+}
